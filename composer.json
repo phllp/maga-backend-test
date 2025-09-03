@@ -1,0 +1,22 @@
+{
+  "name": "phllp/maga-php-test",
+  "description": "PHP Backend dev test application",
+  "type": "project",
+  "require": {
+    "php": ">=8.1",
+    "doctrine/orm": "^2.16",
+    "doctrine/dbal": "^3.7",
+    "vlucas/phpdotenv": "^5.6",
+    "symfony/cache": "^6.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "scripts": {
+    "post-install-cmd": [
+      "@php -r \"file_exists('public/assets') || mkdir('public/assets', 0777, true);\""
+    ]
+  }
+}
