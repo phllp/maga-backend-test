@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Example tiny component */
+.btn {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-md border text-sm font-medium hover:opacity-90;
+}
+.btn-primary {
+  @apply bg-black text-white border-black;
+}
+
+.btn-danger {
+  @apply bg-slate-200 hover:bg-red-600 text-slate-900 border-red-600;
+}
+
+.btn-secondary {
+  @apply bg-slate-200 text-slate-900 border-slate-300 hover:bg-slate-300;
+}
