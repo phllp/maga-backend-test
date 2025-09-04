@@ -50,6 +50,16 @@ class ContatoController extends BaseController
         ]);
     }
 
+    private function validaFormatoDescricao(string $descricao, ContatoTipo $tipo): bool
+    {
+        // Valida o formato para telefones, no caso apenas se o tamanho contempla o formato brasileiro, não há números com mais de 13 dígitos (55 47 9XXXX XXXX)
+        if ($tipo === ContatoTipo::TELEFONE) {
+            return strlen($descricao) <= 13;
+        }
+        // Valida o formato para emails
+        return filter_var($descricao, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
     // POST /contatos  (pessoa_id, tipo, descricao)
     public function create(): void
     {
@@ -64,6 +74,12 @@ class ContatoController extends BaseController
         if ($pessoaId <= 0 || $descricao === '' || $tipo === null) {
             http_response_code(422);
             echo json_encode(['error' => 'Campos obrigatórios: pessoa_id, tipo, descricao']);
+            return;
+        }
+
+        if (!$this->validaFormatoDescricao($descricao, $tipo)) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Formato de descrição inválido']);
             return;
         }
 
@@ -117,6 +133,7 @@ class ContatoController extends BaseController
     }
 
     // POST /contatos/update
+    // todo adicionar validação para o formato do email/telefone
     public function update(): void
     {
         header('Content-Type: application/json; charset=utf-8');
@@ -143,6 +160,12 @@ class ContatoController extends BaseController
         if ($tipo === null && $descricao === '') {
             http_response_code(422);
             echo json_encode(['error' => 'Descrição e Tipo são campos obrigatórios']);
+            return;
+        }
+
+        if (!$this->validaFormatoDescricao($descricao, $tipo)) {
+            http_response_code(422);
+            echo json_encode(['error' => 'Formato de descrição inválido']);
             return;
         }
 
