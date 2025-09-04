@@ -195,7 +195,6 @@
         function renderTable(data) {
             const rows = (data.contatos ?? []).map(c => `
                 <tr data-id="${c.id}">
-                    <td class="p-2 border text-center">${c.id}</td>
                     <td class="p-2 border">${escapeHtml(c.tipo.label)}</td>
                     <td class="p-2 border">${escapeHtml(c.descricao)}</td>
                     <td class="p-2 border flex gap-2">
@@ -214,7 +213,6 @@
                 <table class="min-w-full text-sm border bg-white">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="text-left p-2 border w-20">ID</th>
                             <th class="text-left p-2 border w-24">Tipo</th>
                             <th class="text-left p-2 border">Descrição</th>
                             <th class="text-left p-2 border w-28">Ações</th>
