@@ -2,6 +2,8 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../config/doctrine.php';
+require_once __DIR__ . '/../app/Functions/formatters.php';
+
 
 use App\Controllers\HomeController;
 use App\Controllers\PessoaController;

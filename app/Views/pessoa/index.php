@@ -24,7 +24,7 @@
                     <?php foreach ($pessoas as $p): ?>
                         <tr>
                             <td class="p-2 border"><?= htmlspecialchars($p->getNome()) ?></td>
-                            <td class="p-2 border"><?= htmlspecialchars($p->getCpf()) ?></td>
+                            <td class="p-2 border"><?= htmlspecialchars(format_cpf($p->getCpf())) ?></td>
                             <td class="p-2">
                                 <span class="flex gap-4">
                                     <a class="btn btn-secondary" href="/pessoas/edit?id=<?= htmlspecialchars($p->getId()) ?>">Alterar</a>
