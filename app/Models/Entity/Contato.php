@@ -2,6 +2,7 @@
 
 namespace App\Models\Entity;
 
+use App\Models\Enum\ContatoTipo;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -16,8 +17,8 @@ class Contato
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(type: 'boolean')]
-    private bool $tipo;
+    #[ORM\Column(type: 'integer', enumType: ContatoTipo::class)]
+    private ContatoTipo $tipo;
 
     #[ORM\Column(type: 'string', length: 255)]
     private string $descricao;
@@ -26,7 +27,7 @@ class Contato
     #[ORM\JoinColumn(name: 'pessoa_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Pessoa $pessoa = null;
 
-    public function __construct(bool $tipo, string $descricao, Pessoa $pessoa)
+    public function __construct(ContatoTipo $tipo, string $descricao, Pessoa $pessoa)
     {
         $this->tipo = $tipo;
         $this->descricao = $descricao;
@@ -38,11 +39,11 @@ class Contato
         return $this->id;
     }
 
-    public function isTipo(): bool
+    public function getTipo(): ContatoTipo
     {
         return $this->tipo;
     }
-    public function setTipo(bool $tipo): void
+    public function setTipo(ContatoTipo $tipo): void
     {
         $this->tipo = $tipo;
     }
