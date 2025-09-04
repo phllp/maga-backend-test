@@ -10,7 +10,7 @@
  * @param {string | null | undefined} value
  * @returns {string}
  */
-function formatBrPhone(value) {
+export function formatBrPhone(value) {
   // Converte para string garantindo que null/undefined virem string vazia
   const raw = String(value ?? "");
 
