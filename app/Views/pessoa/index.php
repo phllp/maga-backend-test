@@ -24,9 +24,9 @@
                             <td class="p-2 border"><?= htmlspecialchars($p->getCpf()) ?></td>
                             <td class="p-2">
                                 <span class="flex gap-4">
-                                    <a class="btn btn-secondary" href="/pessoas/create">Alterar</a>
+                                    <a class="btn btn-secondary" href="/pessoas/edit?id=<?= htmlspecialchars($p->getId()) ?>">Alterar</a>
                                     <a class="btn btn-secondary" href="/pessoas/create">Contatos</a>
-                                    <a class="btn btn-secondary" href="/pessoas/create">Visualizar</a>
+                                    <a class="btn btn-secondary" href="/pessoas/view">Visualizar</a>
                                     <a class="btn btn-danger" href="/pessoas/create">Excluir</a>
                                 </span>
                             </td>

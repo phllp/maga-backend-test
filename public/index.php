@@ -29,5 +29,14 @@ if ($uri === '/pessoas/create' && $method === 'POST') {
     exit;
 }
 
+if ($uri === '/pessoas/edit' && $method === 'GET') {
+    (new PessoaController($entityManager))->editForm();
+    exit;
+}
+if ($uri === '/pessoas/update' && $method === 'POST') {
+    (new PessoaController($entityManager))->update();
+    exit;
+}
+
 http_response_code(404);
 echo 'Página não encontrada';
