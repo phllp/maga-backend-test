@@ -39,6 +39,22 @@ class PessoaController extends BaseController
         $this->render('pessoa/create');
     }
 
+    private function isCpfValido(string $cpf): bool
+    {
+        return strlen($cpf) === 11 && ctype_digit($cpf);
+    }
+
+    private function isCpfExistente(string $cpf, string $idPessoa = ''): bool
+    {
+        $existing = $this->em->getRepository(Pessoa::class)->findOneBy(['cpf' => $cpf]);
+        // No caso da criação de uma nova pessoa, o ID será vazio
+        if (strlen($idPessoa) === 0) {
+            // echo '' . $cpf . '' . $idPessoa . '';
+            return $existing !== null;
+        }
+        // Se encontrar uma pessoa com o mesmo CPF, verifica se é a mesma pessoa (update)
+        return $existing && $existing->getId() !== intval($idPessoa);
+    }
 
     public function create(): void
     {
@@ -50,6 +66,22 @@ class PessoaController extends BaseController
             http_response_code(422);
             $error = 'Nome e CPF são obrigatórios.';
             $this->render('pessoa/create', compact('error'));
+            return;
+        }
+
+        // Validação contra CPF duplicado
+        if ($this->isCpfExistente($cpf)) {
+            http_response_code(422);
+            $error = 'Este CPF já está cadastrado.';
+            $this->render('pessoa/create', compact('pessoa', 'error'));
+            return;
+        }
+
+        // Validação do formato do CPF
+        if (!$this->isCpfValido($cpf)) {
+            http_response_code(422);
+            $error = 'CPF inválido. Deve conter exatamente 11 dígitos numéricos.';
+            $this->render('pessoa/create', compact('pessoa', 'error'));
             return;
         }
 
@@ -100,17 +132,23 @@ class PessoaController extends BaseController
             return;
         }
 
-        // Valida se um dos campos foi informado ao menos
+        // Valida se os campos foram informados
         if ($nome === '' && $cpf === '') {
             http_response_code(422);
-            $error = 'Nome ou CPF precisam ser informados.';
+            $error = 'Nome e CPF precisam ser informados.';
+            $this->render('pessoa/edit', compact('pessoa', 'error'));
+            return;
+        }
+
+        if (!$this->isCpfValido($cpf)) {
+            http_response_code(422);
+            $error = 'CPF inválido. Deve conter exatamente 11 dígitos numéricos.';
             $this->render('pessoa/edit', compact('pessoa', 'error'));
             return;
         }
 
         // Validação contra CPF duplicado
-        $existing = $this->em->getRepository(Pessoa::class)->findOneBy(['cpf' => $cpf]);
-        if ($existing && $existing->getId() !== $pessoa->getId()) {
+        if ($this->isCpfExistente($cpf, $pessoa->getId())) {
             http_response_code(422);
             $error = 'Este CPF já está cadastrado.';
             $this->render('pessoa/edit', compact('pessoa', 'error'));
