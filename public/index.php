@@ -5,14 +5,19 @@ require_once __DIR__ . '/../config/doctrine.php';
 
 use App\Controllers\HomeController;
 use App\Controllers\PessoaController;
+use App\Controllers\ContatoController;
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+// Tela inicial
 
 if ($uri === '/' && $method === 'GET') {
     (new HomeController($entityManager))->__invoke();
     exit;
 }
+
+// Endpoints relacionados as Pessoas
 
 if ($uri === '/pessoas' && $method === 'GET') {
     (new PessoaController($entityManager))->index();
@@ -35,6 +40,21 @@ if ($uri === '/pessoas/edit' && $method === 'GET') {
 }
 if ($uri === '/pessoas/update' && $method === 'POST') {
     (new PessoaController($entityManager))->update();
+    exit;
+}
+
+// Endpoints relacionados aos Contatos
+
+if ($uri === '/contatos' && $method === 'GET') {
+    (new ContatoController($entityManager))->indexJson(); // ?pessoaId=123
+    exit;
+}
+if ($uri === '/contatos' && $method === 'POST') {
+    (new ContatoController($entityManager))->create(); // pessoa_id, tipo, descricao
+    exit;
+}
+if ($uri === '/contatos/delete' && $method === 'POST') {
+    (new ContatoController($entityManager))->delete(); // id
     exit;
 }
 
