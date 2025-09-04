@@ -95,7 +95,11 @@
     <?php endif; ?>
 </section>
 
-<script>
+<script type="module">
+    import {
+        formatBrPhone
+    } from '/js/formatters.js';
+
     (function() {
         const modal = document.getElementById('contatosModal');
         const titleEl = document.getElementById('contatosTitle');
@@ -198,7 +202,7 @@
             const rows = (data.contatos ?? []).map(c => `
                 <tr data-id="${c.id}">
                     <td class="p-2 border">${escapeHtml(c.tipo.label)}</td>
-                    <td class="p-2 border">${escapeHtml(c.descricao)}</td>
+                    <td class="p-2 border">${formatBrPhone(escapeHtml(c.descricao))}</td>
                     <td class="p-2 border flex gap-2">
                         <button 
                             class="btn btn-secondary btn-xs js-edit"
