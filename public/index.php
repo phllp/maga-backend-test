@@ -58,5 +58,10 @@ if ($uri === '/contatos/delete' && $method === 'POST') {
     exit;
 }
 
+if ($uri === '/contatos/update' && $method === 'POST') {
+    (new ContatoController($entityManager))->update(); // id, tipo, descricao
+    exit;
+}
+
 http_response_code(404);
 echo 'Página não encontrada';

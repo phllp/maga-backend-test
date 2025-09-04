@@ -63,6 +63,9 @@
 
                             <!-- Novo contato -->
                             <form id="contatoForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                                <!-- Campo hidden para guardar referencia do contato sendo editado -->
+                                <input type="hidden" name="id" id="contatoId">
+                                <!-- Campo hidden para guardar referência da pessoa cujos contatos estão sendo manipulados -->
                                 <input type="hidden" name="pessoa_id" id="contatoPessoaId">
                                 <div>
                                     <label for="contatoTipo" class="block text-sm mb-1">Tipo</label>
@@ -100,8 +103,12 @@
         const alertBox = document.getElementById('contatosAlert');
         const form = document.getElementById('contatoForm');
         const pessoaIdInput = document.getElementById('contatoPessoaId');
+        const contatoIdInput = document.getElementById('contatoId');
+        const tipoSelect = document.getElementById('contatoTipo');
+        const descInput = document.getElementById('contatoDescricao');
 
         let currentPessoaId = null;
+        let editingId = null;
 
         function openModal(pessoaId, pessoaNome) {
             currentPessoaId = pessoaId;
@@ -116,6 +123,9 @@
             tableWrap.innerHTML = '';
             form.reset();
             alertBox.classList.add('hidden');
+            contatoIdInput.value = '';
+            editingId = null;
+            form.querySelector('button[type="submit"]').textContent = 'Adicionar contato';
         }
 
         function setAlert(ok, msg) {
@@ -129,35 +139,28 @@
             alertBox.classList.toggle('text-red-800', !ok);
         }
 
-        function renderTable(data) {
-            const rows = (data.contatos ?? []).map(c => `
-      <tr data-id="${c.id}">
-        <td class="p-2 border text-center">${c.id}</td>
-        <td class="p-2 border">${escapeHtml(c.tipo.label)}</td>
-        <td class="p-2 border">${escapeHtml(c.descricao)}</td>
-        <td class="p-2 border">
-          <button class="btn btn-danger btn-xs js-del" data-id="${c.id}">Excluir</button>
-        </td>
-      </tr>
-    `).join('');
+        // associa o botão de update a cada registro respectivamente
+        function bindRowUpdateAction() {
+            tableWrap.querySelectorAll('.js-edit').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = btn.getAttribute('data-id');
+                    const tipo = btn.getAttribute('data-tipo');
+                    const descricao = btn.getAttribute('data-descricao');
 
-            tableWrap.innerHTML = `
-      <table class="min-w-full text-sm border bg-white">
-        <thead class="bg-gray-100">
-          <tr>
-            <th class="text-left p-2 border w-20">ID</th>
-            <th class="text-left p-2 border w-24">Tipo</th>
-            <th class="text-left p-2 border">Descrição</th>
-            <th class="text-left p-2 border w-28">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows || `<tr><td class="p-3 text-gray-600 border" colspan="4">Nenhum contato.</td></tr>`}
-        </tbody>
-      </table>
-    `;
+                    editingId = id;
+                    contatoIdInput.value = id;
+                    tipoSelect.value = tipo;
+                    descInput.value = descricao;
 
-            // associa o botão de delete a cada registro respectivamente
+
+                    form.querySelector('button[type="submit"]').textContent = 'Salvar alterações';
+                });
+            });
+        }
+
+        // associa o botão de delete a cada registro respectivamente
+        function bindRowDeleteAction() {
             tableWrap.querySelectorAll('.js-del').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     const id = btn.getAttribute('data-id');
@@ -189,6 +192,44 @@
             });
         }
 
+        function renderTable(data) {
+            const rows = (data.contatos ?? []).map(c => `
+                <tr data-id="${c.id}">
+                    <td class="p-2 border text-center">${c.id}</td>
+                    <td class="p-2 border">${escapeHtml(c.tipo.label)}</td>
+                    <td class="p-2 border">${escapeHtml(c.descricao)}</td>
+                    <td class="p-2 border flex gap-2">
+                        <button 
+                            class="btn btn-secondary btn-xs js-edit"
+                            data-id="${c.id}"
+                            data-tipo="${c.tipo.value}"
+                            data-descricao="${escapeHtml(c.descricao)}">Editar
+                        </button>
+                        <button class="btn btn-danger btn-xs js-del" data-id="${c.id}">Excluir</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tableWrap.innerHTML = `
+                <table class="min-w-full text-sm border bg-white">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left p-2 border w-20">ID</th>
+                            <th class="text-left p-2 border w-24">Tipo</th>
+                            <th class="text-left p-2 border">Descrição</th>
+                            <th class="text-left p-2 border w-28">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows || `<tr><td class="p-3 text-gray-600 border" colspan="4">Nenhum contato.</td></tr>`}
+                    </tbody>
+                </table>
+            `;
+
+            bindRowUpdateAction()
+            bindRowDeleteAction()
+        }
+
         async function loadContatos(pessoaId) {
             tableWrap.innerHTML = `<div class="p-3 text-sm text-gray-500">Carregando…</div>`;
             try {
@@ -201,20 +242,29 @@
             }
         }
 
-        // Novo contato
+        // O evento de submit pode ser Update ou Create
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             const body = new FormData(form);
+            const isUpdate = !!editingId;
+            const url = isUpdate ? '/contatos/update' : '/contatos';
+
             try {
-                const res = await fetch('/contatos', {
+                const res = await fetch(url, {
                     method: 'POST',
                     body
                 });
                 const json = await res.json();
-                if (!json.ok) throw new Error(json.error || 'Falha ao adicionar contato.');
-                setAlert(true, 'Contato adicionado.');
+                if (!json.ok) throw new Error(json.error || 'Falha na operação.');
+
+                setAlert(true, isUpdate ? 'Contato atualizado.' : 'Contato adicionado.');
+                // Reset form back to create mode
+                editingId = null;
+                contatoIdInput.value = '';
+                form.querySelector('button[type="submit"]').textContent = 'Adicionar contato';
                 form.reset();
-                // Recarrega a lista
+
+                // Reload the list
                 loadContatos(currentPessoaId);
             } catch (err) {
                 setAlert(false, err.message);

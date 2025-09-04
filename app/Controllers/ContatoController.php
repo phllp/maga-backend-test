@@ -115,4 +115,49 @@ class ContatoController extends BaseController
 
         echo json_encode(['ok' => true]);
     }
+
+    // POST /contatos/update
+    public function update(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $id        = (int)($_POST['id'] ?? 0);
+        $tipoRaw   = $_POST['tipo'] ?? null;
+        $descricao = trim($_POST['descricao'] ?? '');
+
+        if ($id <= 0) {
+            http_response_code(400);
+            echo json_encode(['error' => 'ID inválido']);
+            return;
+        }
+
+        $contato = $this->em->find(Contato::class, $id);
+        if (!$contato) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Contato não encontrado']);
+            return;
+        }
+
+        // Valida se os dados foram informados, ambos precisam ser informados
+        $tipo = ContatoTipo::tryFrom((int)$tipoRaw);
+        if ($tipo === null && $descricao === '') {
+            http_response_code(422);
+            echo json_encode(['error' => 'Descrição e Tipo são campos obrigatórios']);
+            return;
+        }
+
+        $contato->setTipo($tipo);
+        $contato->setDescricao($descricao);
+
+        $this->em->flush();
+
+        echo json_encode([
+            'ok' => true,
+            'contato' => [
+                'id'        => $contato->getId(),
+                'tipo'      => ['value' => $contato->getTipo()->value, 'label' => $contato->getTipo()->label()],
+                'descricao' => $contato->getDescricao(),
+            ]
+        ]);
+    }
 }
