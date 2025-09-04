@@ -35,7 +35,6 @@
                                         data-pessoa-nome="<?= htmlspecialchars($p->getNome()) ?>">
                                         Contatos
                                     </button>
-                                    <a class="btn btn-secondary" href="/pessoas/view">Visualizar</a>
                                     <a class="btn btn-danger" href="/pessoas/create">Excluir</a>
                                 </span>
                             </td>
