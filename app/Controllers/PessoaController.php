@@ -14,8 +14,23 @@ class PessoaController extends BaseController
 
     public function index(): void
     {
-        $pessoas = $this->em->getRepository(Pessoa::class)->findBy([], ['id' => 'DESC']);
-        $this->render('pessoa/index', compact('pessoas'));
+        $q = trim($_GET['q'] ?? '');
+
+        if ($q !== '') {
+            $qb = $this->em->createQueryBuilder();
+            $pessoas = $qb->select('p')
+                ->from(Pessoa::class, 'p')
+                ->where($qb->expr()->like('LOWER(p.nome)', ':q'))
+                ->setParameter('q', '%' . mb_strtolower($q) . '%')
+                ->orderBy('p.nome', 'ASC')
+                ->getQuery()
+                ->getResult();
+        } else {
+            $pessoas = $this->em->getRepository(Pessoa::class)
+                ->findBy([], ['id' => 'DESC']);
+        }
+
+        $this->render('pessoa/index', compact('pessoas', 'q'));
     }
 
 

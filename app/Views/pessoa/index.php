@@ -4,6 +4,9 @@
         <a class="btn btn-primary" href="/pessoas/create">Cadastrar</a>
     </div>
 
+    <!-- Barra de busca -->
+    <?php $q = $q ?? '';
+    require __DIR__ . '/../components/search-bar.php'; ?>
 
     <?php if (empty($pessoas)): ?>
         <p class="text-gray-600">Nenhuma pessoa cadastrada.</p>
