@@ -54,7 +54,9 @@ class ContatoController extends BaseController
     {
         // Valida o formato para telefones, no caso apenas se o tamanho contempla o formato brasileiro, não há números com mais de 13 dígitos (55 47 9XXXX XXXX)
         if ($tipo === ContatoTipo::TELEFONE) {
-            return strlen($descricao) <= 13;
+            //Permite apenas números, parênteses e hífen
+            $validChars = boolval(preg_match('/^[0-9()\-]+$/', $descricao));
+            return strlen($descricao) <= 13 && $validChars;
         }
         // Valida o formato para emails
         return filter_var($descricao, FILTER_VALIDATE_EMAIL) !== false;
@@ -133,7 +135,6 @@ class ContatoController extends BaseController
     }
 
     // POST /contatos/update
-    // todo adicionar validação para o formato do email/telefone
     public function update(): void
     {
         header('Content-Type: application/json; charset=utf-8');
