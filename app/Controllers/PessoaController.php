@@ -171,4 +171,28 @@ class PessoaController extends BaseController
 
         header('Location: /pessoas');
     }
+
+    // POST /pessoas/delete  (id)
+    public function delete(): void
+    {
+        $id = (int)($_POST['id'] ?? 0);
+        if ($id <= 0) {
+            http_response_code(400);
+            echo 'ID inválido.';
+            return;
+        }
+
+        $pessoa = $this->em->find(Pessoa::class, $id);
+        if (!$pessoa) {
+            http_response_code(404);
+            echo 'Pessoa não encontrada.';
+            return;
+        }
+
+        $this->em->remove($pessoa);
+        $this->em->flush();
+
+        // Sucesso -> volta para a lista
+        header('Location: /pessoas');
+    }
 }

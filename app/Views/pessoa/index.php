@@ -35,7 +35,11 @@
                                         data-pessoa-nome="<?= htmlspecialchars($p->getNome()) ?>">
                                         Contatos
                                     </button>
-                                    <a class="btn btn-danger" href="/pessoas/create">Excluir</a>
+                                    <form method="post" action="/pessoas/delete"
+                                        onsubmit="return confirm('Tem certeza que deseja excluir esta pessoa?');">
+                                        <input type="hidden" name="id" value="<?= htmlspecialchars((string)$p->getId()) ?>">
+                                        <button type="submit" class="btn btn-danger">Excluir</button>
+                                    </form>
                                 </span>
                             </td>
                         </tr>

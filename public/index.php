@@ -45,6 +45,11 @@ if ($uri === '/pessoas/update' && $method === 'POST') {
     exit;
 }
 
+if ($uri === '/pessoas/delete' && $method === 'POST') {
+    (new PessoaController($entityManager))->delete();
+    exit;
+}
+
 // Endpoints relacionados aos Contatos
 
 if ($uri === '/contatos' && $method === 'GET') {
