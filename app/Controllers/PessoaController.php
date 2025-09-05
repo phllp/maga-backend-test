@@ -81,7 +81,7 @@ class PessoaController extends BaseController
         if (!$this->isCpfValido($cpf)) {
             http_response_code(422);
             $error = 'CPF inválido. Deve conter exatamente 11 dígitos numéricos.';
-            $this->render('pessoa/create', compact('pessoa', 'error'));
+            $this->render('pessoa/create', compact('error'));
             return;
         }
 
