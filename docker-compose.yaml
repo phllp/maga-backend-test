@@ -17,5 +17,21 @@ services:
       timeout: 5s
       retries: 5
 
+  app:
+    build: .
+    container_name: maga-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: maga_db
+      DB_USER: admin
+      DB_PASS: admin
+      APP_DEV: "true"
+    ports:
+      - "8000:8000"
+
 volumes:
   pgdata:
